@@ -136,7 +136,7 @@ $(document).ready(function() {
     // 排序下拉框变化事件
     $('#sortSelect').on('change', function() {
         const sortValue = $(this).val();
-        alert(`已按${$(this).find('option:selected').text()}重新排列作品`);
+        alert(`已${$(this).find('option:selected').text()}重新排列作品`);
         // 这里可以添加实际排序逻辑
     });
     
