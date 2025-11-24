@@ -173,6 +173,7 @@ body::before {
     font-weight: bold;
     color: var(--primary-color);
     text-decoration: none;
+    text-shadow: 1px 1px 4px rgba(255, 254, 254, 0.4);
 }
 
 .nav-menu {
@@ -189,6 +190,7 @@ body::before {
     text-decoration: none;
     font-weight: 500;
     transition: var(--transition);
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
 }
 
 .nav-link:hover {
