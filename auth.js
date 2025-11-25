@@ -63,7 +63,7 @@ $(document).ready(function () {
             localStorage.setItem('currentUser', username);
 
             // 跳转到首页
-            window.location.href = 'index.html';
+            window.location.href = './nikki.html';
         } catch (error) {
             console.error('登录失败:', error);
             alert('登录失败: ' + error.message);
