@@ -1,24 +1,72 @@
 // auth.js - 注册和登录表单验证
-$(document).ready(function() {
+
+import { UserDB } from './idb-util.js';
+// 初始化数据库
+UserDB.init();
+
+$(document).ready(function () {
     // 注册表单验证
-    $('#registerForm').on('submit', function(e) {
+    $('#registerForm').on('submit', async function (e) {
         e.preventDefault();
         if (validateRegisterForm()) {
-            alert('注册成功！即将跳转至登录页');
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 1500);
+            const user = {
+                username: $('#username').val().trim(),
+                password: $('#password').val().trim(), // 实际项目中应加密存储
+                phone: $('#phone').val().trim(),
+                isLoggedIn: false
+            };
+
+            try {
+                // 保存用户到IndexedDB
+                await UserDB.saveUser(user);
+                alert('注册成功！即将跳转至登录页');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            } catch (error) {
+                console.error('保存用户失败:', error);
+                alert('注册失败: ' + error.message);
+            }
         }
     });
-
     // 登录表单验证
-    $('#loginForm').on('submit', function(e) {
+    $('#loginForm').submit(async function (e) {
         e.preventDefault();
-        if (validateLoginForm()) {
-            alert('登录成功！即将跳转至首页');
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
+
+        if (!validateLoginForm()) {
+            return;
+        }
+
+        const username = $('#loginUsername').val().trim();
+        const password = $('#loginPassword').val().trim();
+
+        try {
+            // 初始化数据库
+            await UserDB.init();
+
+            // 获取用户数据
+            const user = await UserDB.getUser(username);
+
+            if (!user) {
+                showError('loginUsernameError', '用户名不存在');
+                return;
+            }
+
+            // 验证密码
+            if (user.password !== password) {
+                showError('loginPasswordError', '密码不正确');
+                return;
+            }
+
+            // 登录成功，更新用户状态为在线
+            await UserDB.saveUser({ ...user, isLoggedIn: true });
+            localStorage.setItem('currentUser', username);
+
+            // 跳转到首页
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('登录失败:', error);
+            alert('登录失败: ' + error.message);
         }
     });
 
@@ -77,17 +125,17 @@ function validateLoginForm() {
 // 用户名验证
 function validateUsername() {
     const username = $('#username').val().trim();
-    
+
     if (!username) {
         showError('usernameError', '用户名不能为空，请输入');
         return false;
     }
-    
+
     if (!isValidUsernameFormat(username)) {
         showError('usernameError', '用户名格式错误，需为 4-16 位字母 / 数字 / 下划线');
         return false;
     }
-    
+
     hideError('usernameError');
     return true;
 }
@@ -95,17 +143,17 @@ function validateUsername() {
 // 密码验证
 function validatePassword() {
     const password = $('#password').val().trim();
-    
+
     if (!password) {
         showError('passwordError', '密码不能为空，请输入');
         return false;
     }
-    
+
     if (!isValidPasswordFormat(password)) {
         showError('passwordError', '密码格式错误，需为 8 位且包含大小写字母和数字');
         return false;
     }
-    
+
     hideError('passwordError');
     return true;
 }
@@ -114,17 +162,17 @@ function validatePassword() {
 function validateConfirmPassword() {
     const password = $('#password').val().trim();
     const confirmPassword = $('#confirmPassword').val().trim();
-    
+
     if (!confirmPassword) {
         showError('confirmPasswordError', '确认密码不能为空，请输入');
         return false;
     }
-    
+
     if (password !== confirmPassword) {
         showError('confirmPasswordError', '两次密码输入不一致，请重新输入');
         return false;
     }
-    
+
     hideError('confirmPasswordError');
     return true;
 }
@@ -132,17 +180,17 @@ function validateConfirmPassword() {
 // 手机号验证
 function validatePhone() {
     const phone = $('#phone').val().trim();
-    
+
     if (!phone) {
         showError('phoneError', '手机号不能为空，请输入');
         return false;
     }
-    
+
     if (!isValidPhoneFormat(phone)) {
         showError('phoneError', '手机号格式错误，请输入正确手机号');
         return false;
     }
-    
+
     hideError('phoneError');
     return true;
 }
