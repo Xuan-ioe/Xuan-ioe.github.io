@@ -16,6 +16,20 @@
     --transition: all 0.3s ease;
 }
 
+/* 导航栏logo图片样式 */
+.logo-img {
+    width: 40px; /* 根据需要调整宽度 */
+    height: auto; /* 保持宽高比 */
+    margin-right: 10px; /* 与文字保持间距 */
+    vertical-align: middle; /* 与文字垂直居中对齐 */
+}
+
+/* 调整导航logo容器样式 */
+.nav-logo a {
+    display: flex;
+    align-items: center; /* 垂直居中对齐图片和文字 */
+}
+
 body {
     font-family: 'Noto Sans SC', "song", sans-serif;
     line-height: 1.6;
